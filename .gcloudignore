@@ -1,0 +1,12 @@
+.git
+node_modules
+venv
+__pycache__
+*.pyc
+dashboard/node_modules
+backend/venv
+backend/__pycache__
+backend/data
+.env
+.env.*
+data/
