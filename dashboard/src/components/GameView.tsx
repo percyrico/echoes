@@ -39,9 +39,8 @@ export default function GameView() {
   const timerSeconds = useGameStore((s) => s.timerSeconds);
   const canBreakLoop = useGameStore((s) => s.canBreakLoop);
   const choices = useGameStore((s) => s.choices);
-  const waitingForChoice = useGameStore((s) => s.waitingForChoice);
   const isNarratorSpeaking = useGameStore((s) => s.isNarratorSpeaking);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const { sendJSON } = useWebSocket();
   useAudioPlayback();
@@ -131,101 +130,107 @@ export default function GameView() {
       {/* Main content */}
       <div className="relative z-10 flex-1 flex overflow-hidden">
         {/* Center column */}
-        <div className="flex-1 flex flex-col overflow-hidden p-4 gap-4">
-          {/* Scene image */}
-          <SceneImage />
+        <div className="flex-1 flex flex-col overflow-hidden p-3 md:p-4 gap-2 md:gap-3">
+          {/* Scrollable content: image + narrator */}
+          <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-2 md:gap-3">
+            {/* Scene image */}
+            <SceneImage />
 
-          {/* Narrator box */}
-          <div className="flex-1 min-h-0">
-            <NarratorBox />
+            {/* Narrator box */}
+            <div className="flex-1 min-h-[120px]">
+              <NarratorBox />
+            </div>
           </div>
 
-          {/* Break loop button */}
-          <AnimatePresence>
-            {canBreakLoop && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                className="flex justify-center"
-              >
-                <motion.button
-                  onClick={handleBreakLoop}
-                  className="px-6 py-2 rounded-xl bg-echo-success/20 border border-echo-success/50 text-echo-success font-display font-semibold text-sm hover:bg-echo-success/30 transition-all"
-                  animate={{ boxShadow: ["0 0 10px rgba(46,213,115,0.2)", "0 0 25px rgba(46,213,115,0.4)", "0 0 10px rgba(46,213,115,0.2)"] }}
-                  transition={{ duration: 2, repeat: Infinity }}
+          {/* Fixed bottom: break loop + choices — always visible */}
+          <div className="shrink-0">
+            {/* Break loop button */}
+            <AnimatePresence>
+              {canBreakLoop && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className="flex justify-center mb-2"
                 >
-                  Break the Loop
-                </motion.button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                  <motion.button
+                    onClick={handleBreakLoop}
+                    className="px-6 py-2 rounded-xl bg-echo-success/20 border border-echo-success/50 text-echo-success font-display font-semibold text-sm hover:bg-echo-success/30 transition-all"
+                    animate={{ boxShadow: ["0 0 10px rgba(46,213,115,0.2)", "0 0 25px rgba(46,213,115,0.4)", "0 0 10px rgba(46,213,115,0.2)"] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    Break the Loop
+                  </motion.button>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-          {/* Choice buttons */}
-          <AnimatePresence mode="wait">
-            {waitingForChoice && choices.length > 0 ? (
-              <motion.div
-                key="choices"
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.4 }}
-                className="flex flex-col gap-2"
-              >
-                <p className="text-echo-muted text-xs font-display text-center mb-1">
-                  What do you do?
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {choices.map((choice, i) => (
-                    <motion.button
-                      key={choice}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.08, duration: 0.3 }}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.97 }}
-                      onClick={() => handleChoice(choice)}
-                      className="text-left px-4 py-3 rounded-xl border border-echo-border/60 bg-echo-surface/60 hover:border-echo-accent/50 hover:bg-echo-accent/10 text-echo-text text-sm font-story transition-all"
-                    >
-                      <span className="text-echo-accent font-display font-semibold mr-2 text-xs">
-                        {String.fromCharCode(65 + i)}.
-                      </span>
-                      {choice}
-                    </motion.button>
-                  ))}
-                </div>
-              </motion.div>
-            ) : isNarratorSpeaking ? (
-              <motion.div
-                key="speaking"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="flex items-center justify-center gap-2 py-3"
-              >
-                <div className="flex items-center gap-1">
-                  {[0, 1, 2, 3, 4].map((i) => (
-                    <motion.div
-                      key={i}
-                      className="w-1 bg-echo-accent rounded-full"
-                      animate={{ height: [4, 14, 4] }}
-                      transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.1 }}
-                    />
-                  ))}
-                </div>
-                <span className="text-echo-muted text-xs font-display">Narrator is speaking...</span>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="waiting"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 0.5 }}
-                className="text-center py-3"
-              >
-                <span className="text-echo-muted/50 text-xs font-display">Listening...</span>
-              </motion.div>
-            )}
-          </AnimatePresence>
+            {/* Choice buttons */}
+            <AnimatePresence mode="wait">
+              {choices.length > 0 ? (
+                <motion.div
+                  key="choices"
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.4 }}
+                  className="flex flex-col gap-2"
+                >
+                  <p className="text-echo-muted text-xs font-display text-center">
+                    What do you do?
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 md:gap-2 max-h-[40vh] overflow-y-auto">
+                    {choices.map((choice, i) => (
+                      <motion.button
+                        key={choice}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.08, duration: 0.3 }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.97 }}
+                        onClick={() => handleChoice(choice)}
+                        className="text-left px-3 py-2 md:px-4 md:py-3 rounded-xl border border-echo-border/60 bg-echo-surface/60 hover:border-echo-accent/50 hover:bg-echo-accent/10 text-echo-text text-xs md:text-sm font-story transition-all"
+                      >
+                        <span className="text-echo-accent font-display font-semibold mr-1.5 text-xs">
+                          {String.fromCharCode(65 + i)}.
+                        </span>
+                        {choice}
+                      </motion.button>
+                    ))}
+                  </div>
+                </motion.div>
+              ) : isNarratorSpeaking ? (
+                <motion.div
+                  key="speaking"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="flex items-center justify-center gap-2 py-2"
+                >
+                  <div className="flex items-center gap-1">
+                    {[0, 1, 2, 3, 4].map((i) => (
+                      <motion.div
+                        key={i}
+                        className="w-1 bg-echo-accent rounded-full"
+                        animate={{ height: [4, 14, 4] }}
+                        transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.1 }}
+                      />
+                    ))}
+                  </div>
+                  <span className="text-echo-muted text-xs font-display">Narrator is speaking...</span>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="waiting"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 0.5 }}
+                  className="text-center py-2"
+                >
+                  <span className="text-echo-muted/50 text-xs font-display">Listening...</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
 
         {/* Sidebar */}

@@ -459,17 +459,22 @@ class SessionManager:
                 await asyncio.sleep(1)
                 state = self.game_states.get(session_id)
                 ws = self.websockets.get(session_id)
-                if not state or not ws or state.loop_status != LoopStatus.ACTIVE:
+                if not state or not ws:
+                    break
+                if state.loop_status != LoopStatus.ACTIVE:
+                    print(f"[Timer] Loop not active ({state.loop_status}), stopping updates", flush=True)
                     break
                 if state.loop_start_time:
                     elapsed = time.time() - state.loop_start_time
-                    remaining = max(0, state.loop_duration_seconds - elapsed)
+                    remaining = state.loop_duration_seconds - elapsed
+
+                    # Send update even if at/below zero (frontend needs to see 0)
                     try:
                         await ws.send_json({
                             "type": "timer_update",
                             "data": {
-                                "seconds": int(remaining),
-                                "remaining_seconds": int(remaining),
+                                "seconds": max(0, int(remaining)),
+                                "remaining_seconds": max(0, int(remaining)),
                                 "total_seconds": state.loop_duration_seconds,
                                 "elapsed_seconds": int(elapsed),
                             },
@@ -477,8 +482,9 @@ class SessionManager:
                     except Exception:
                         break
 
-                    # If timer hit zero, trigger loop fail from here too
+                    # If timer hit zero, trigger loop fail
                     if remaining <= 0:
+                        print(f"[Timer] Time's up for {session_id}! remaining={remaining:.1f}", flush=True)
                         # Cancel the sleep-based timer so it doesn't double-fire
                         timer_task = self._loop_timers.pop(session_id, None)
                         if timer_task and not timer_task.done():

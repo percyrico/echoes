@@ -138,7 +138,32 @@ export function useWebSocket() {
         }
         case "timer_update": {
           const timerData = msg.data as { seconds?: number; remaining_seconds?: number };
-          s.setTimer(timerData.seconds ?? timerData.remaining_seconds ?? 0);
+          const secs = timerData.seconds ?? timerData.remaining_seconds ?? 0;
+          s.setTimer(secs);
+
+          // Frontend fallback: if timer hits 0 and we're still in game view,
+          // wait 3s then force loop_fail if backend hasn't sent it
+          if (secs <= 0 && useGameStore.getState().view === "game") {
+            setTimeout(() => {
+              const current = useGameStore.getState();
+              if (current.view === "game" && current.timerSeconds <= 0) {
+                console.warn("[WS] Timer fallback: forcing loop_fail view");
+                current.setLastDeathDescription("Time ran out. The loop resets.");
+                current.addLoopEntry({
+                  loop_number: current.currentLoop,
+                  summary: "",
+                  actions_taken: [],
+                  clues_found: [],
+                  duration_seconds: current.gameState?.loop_duration_seconds ?? 300,
+                  status: "failed",
+                  death_description: "Time ran out. The loop resets.",
+                  scene_image_url: null,
+                  death_image_url: null,
+                });
+                current.setView("loop_fail");
+              }
+            }, 3000);
+          }
           break;
         }
         case "mood_change":

@@ -123,7 +123,7 @@ export default function ScenarioLobby() {
   };
 
   return (
-    <div className="relative h-full w-full flex flex-col items-center overflow-y-auto">
+    <div className="relative h-full w-full flex flex-col items-center overflow-hidden">
       {/* Background particles */}
       <MoodParticles mood="mysterious" />
 
@@ -136,16 +136,16 @@ export default function ScenarioLobby() {
         }}
       />
 
-      <div className="relative z-10 flex flex-col items-center gap-4 px-4 py-4 max-w-6xl w-full">
+      <div className="relative z-10 flex flex-col items-center h-full w-full px-4 py-3 md:py-4 max-w-6xl mx-auto">
         {/* Title */}
         <motion.div
-          initial={{ opacity: 0, y: -30 }}
+          initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-center"
+          className="text-center shrink-0"
         >
           <div className="relative inline-block">
-            <h1 className="text-4xl md:text-5xl font-display font-bold text-echo-text tracking-wider">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-echo-text tracking-wider">
               ECHOES
             </h1>
             {/* Ripple rings behind title */}
@@ -170,31 +170,32 @@ export default function ScenarioLobby() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.8 }}
-            className="text-echo-muted font-story text-sm italic mt-2"
+            className="text-echo-muted font-story text-xs md:text-sm italic mt-1"
           >
             Every loop reveals the truth
           </motion.p>
         </motion.div>
 
-        {/* Scenario grid */}
+        {/* Scenario grid — fills available space */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.6 }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 w-full"
+          className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 w-full flex-1 mt-3 md:mt-4 min-h-0 auto-rows-fr"
+          style={{ maxHeight: "calc(100vh - 240px)" }}
         >
           {SCENARIOS.map((scenario, i) => {
             const isSelected = selected === scenario.id;
             return (
               <motion.button
                 key={scenario.id}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 + i * 0.1, duration: 0.5 }}
+                transition={{ delay: 0.3 + i * 0.05, duration: 0.4 }}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setSelected(scenario.id)}
-                className={`relative text-left p-3 rounded-xl border transition-all duration-300 overflow-hidden ${
+                className={`relative text-left p-3 md:p-4 rounded-xl border transition-all duration-300 overflow-hidden flex flex-col ${
                   isSelected
                     ? "border-echo-accent glow-accent"
                     : "border-echo-border hover:border-echo-accent/30"
@@ -212,42 +213,32 @@ export default function ScenarioLobby() {
                   />
                 )}
 
-                <div className="flex items-start gap-2">
-                  <span className="text-xl mt-0.5">{SCENARIO_ICONS[scenario.id]}</span>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-0.5">
-                      <h3 className="text-echo-text font-display font-semibold text-sm">
-                        {scenario.name}
-                      </h3>
-                    </div>
-                    <p className="text-echo-muted text-xs font-story leading-snug mb-2 line-clamp-3">
-                      {scenario.description}
-                    </p>
-                    <div className="flex items-center gap-2 text-xs text-echo-muted/80 font-mono">
-                      <span title="Difficulty">{scenario.difficulty}</span>
-                      <span className="text-echo-border">|</span>
-                      <span>{scenario.estimated_loops}</span>
-                    </div>
-                  </div>
+                <div className="flex items-center gap-2 mb-1 md:mb-2">
+                  <span className="text-2xl md:text-3xl">{SCENARIO_ICONS[scenario.id]}</span>
+                  <h3 className="text-echo-text font-display font-semibold text-sm md:text-base leading-tight">
+                    {scenario.name}
+                  </h3>
+                </div>
+                <p className="text-echo-muted text-xs md:text-sm font-story leading-snug flex-1 line-clamp-3 md:line-clamp-4">
+                  {scenario.description}
+                </p>
+                <div className="flex items-center gap-2 text-xs text-echo-muted/80 font-mono mt-1 md:mt-2">
+                  <span title="Difficulty">{scenario.difficulty}</span>
+                  <span className="text-echo-border">|</span>
+                  <span>{scenario.estimated_loops}</span>
                 </div>
               </motion.button>
             );
           })}
         </motion.div>
 
-        {/* Player name input */}
+        {/* Bottom bar: name input + start button */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6, duration: 0.5 }}
-          className="w-full max-w-sm"
+          className="shrink-0 flex flex-col sm:flex-row items-center gap-3 mt-3 md:mt-4 w-full max-w-lg"
         >
-          <label
-            htmlFor="player-name"
-            className="block text-echo-muted font-display text-sm mb-2 tracking-wide"
-          >
-            Your Name
-          </label>
           <input
             id="player-name"
             type="text"
@@ -255,36 +246,31 @@ export default function ScenarioLobby() {
             onChange={(e) => setPlayerNameLocal(e.target.value)}
             placeholder="Enter your name..."
             maxLength={30}
-            className="w-full px-4 py-3 rounded-xl bg-echo-surface border border-echo-border text-echo-text placeholder-echo-muted font-story text-base outline-none focus:border-echo-accent/60 transition-colors duration-300"
+            className="w-full sm:flex-1 px-4 py-2.5 rounded-xl bg-echo-surface border border-echo-border text-echo-text placeholder-echo-muted font-story text-sm md:text-base outline-none focus:border-echo-accent/60 transition-colors duration-300"
           />
+          <button
+            onClick={handleStart}
+            disabled={!selected || !playerName.trim() || isStarting}
+            className={`w-full sm:w-auto px-6 py-2.5 rounded-xl font-display font-semibold text-sm md:text-base transition-all duration-300 whitespace-nowrap ${
+              selected && playerName.trim()
+                ? "bg-echo-accent text-white hover:bg-echo-accent/90 glow-accent cursor-pointer"
+                : "bg-echo-panel text-echo-muted border border-echo-border cursor-not-allowed"
+            }`}
+          >
+            {isStarting ? (
+              <span className="flex items-center justify-center gap-2">
+                <motion.span
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                  className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
+                />
+                Entering...
+              </span>
+            ) : (
+              "Enter the Loop \u2192"
+            )}
+          </button>
         </motion.div>
-
-        {/* Start button */}
-        <motion.button
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.8, duration: 0.5 }}
-          onClick={handleStart}
-          disabled={!selected || !playerName.trim() || isStarting}
-          className={`px-8 py-3 rounded-xl font-display font-semibold text-base transition-all duration-300 ${
-            selected && playerName.trim()
-              ? "bg-echo-accent text-white hover:bg-echo-accent/90 glow-accent cursor-pointer"
-              : "bg-echo-panel text-echo-muted border border-echo-border cursor-not-allowed"
-          }`}
-        >
-          {isStarting ? (
-            <span className="flex items-center gap-2">
-              <motion.span
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
-              />
-              Entering...
-            </span>
-          ) : (
-            "Enter the Loop \u2192"
-          )}
-        </motion.button>
       </div>
     </div>
   );
