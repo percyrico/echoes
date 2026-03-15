@@ -70,16 +70,17 @@ No external databases or services required. Everything runs on SQLite locally.
 
 Pick from 8 detective mysteries, each with unique characters, clue networks, and solutions:
 
-| Scenario | Premise |
-|----------|---------|
-| **The Last Train** | A passenger found dead on a locked night train. Everyone has an alibi. |
-| **The Locked Room** | A professor killed inside a study locked from the inside. No weapon found. |
-| **The Dinner Party** | A host collapses mid-toast. The wine was shared. The motive was not. |
-| **The Signal** | A lighthouse keeper vanishes. The logbook entry for that night was torn out. |
-| **The Crash** | A single-car accident on a straight road. No skid marks. The phone was wiped remotely. |
-| **The Heist** | A museum robbery with no alarms. The thief left the most valuable painting behind. |
-| **Room 414** | A hotel guest checks out but never leaves the building. The room is too clean. |
-| **The Factory** | A worker dies in an industrial accident. Safety records were falsified. |
+| Scenario | Premise |                                                                                                                                                                                                                      
+  |----------|---------|                 
+  | **The Last Train** | A midnight express hurtles through the storm. Someone on board won't survive the journey. |                                                                                                                          
+  | **The Locked Room** | You wake up in a sealed Victorian study. The clock is ticking. The door won't open until you understand why. |
+  | **The Dinner Party** | Eight guests. One poisoner. The dessert course is fatal. You have five minutes to find out who — before the chocolate soufflé arrives. |                                                                           
+  | **The Signal** | A deep-space research station has gone silent. You're the only one awake. The signal it received is changing the station — and you. |
+  | **The Crash** | A private plane went down in the mountains. All four passengers survived — but only three walked away. Someone sabotaged the aircraft. |
+  | **The Heist** | A priceless diamond vanished during a museum gala. The security chief lies unconscious. The thief is still inside. |
+  | **Room 414** | A tech CEO found dead in a luxury hotel room. The police say suicide. The evidence says otherwise. Someone in this hotel is lying. |
+  | **The Factory** | An explosion at a chemical plant killed three workers. The company blames equipment failure. But someone disabled the safety systems — and someone else was paid to look away. |
+
 
 ### 2. Enter Your Name
 
